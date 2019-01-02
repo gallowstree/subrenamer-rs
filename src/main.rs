@@ -8,18 +8,15 @@ use std::fs::DirEntry;
 const VID_EXTENSIONS: [&str; 1] = ["mkv"];
 const SUB_EXTENSIONS: [&str; 1] = ["srt"];
 
+
 fn main() {
+    //use glob
     let directory = fs::read_dir("/home/alejandro/Documents/DATA/series/The.Office Season 1-8 [720p] [HD]/The.Office - Season 4 [720p]").unwrap();
 
     let (vid, sub): (Vec<DirEntry>, Vec<DirEntry>) = directory
         .into_iter()
-        .filter_map(|res| match res {
-            Ok(entry) => vid_or_sub_entry(entry),
-            Err(_) => None
-    }).partition(is_video); // can convert to episode above and take an episode in is_video
-
-
-
+        .filter_map(|result| result.ok().and_then(to_episode))
+        .partition(is_video); // can convert to episode above and take an episode in is_video
 
 }
 
@@ -52,5 +49,5 @@ fn to_episode(entry: &DirEntry) -> Option<Episode> {
 struct Episode<'a> {
     season: u32,
     episode: u32,
-    entry: &'a DirEntry
+    entry: &'a DirEntry //Use str
 }
